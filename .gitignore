@@ -102,3 +102,10 @@ Desktop.ini
 # Thumbnails
 ._*
 Thumbs.db
+bin/
+include/
+lib64
+
+pyvenv.cfg
+
+*.cfg
