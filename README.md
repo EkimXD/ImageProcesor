@@ -13,7 +13,7 @@ from image_procesor import ImageProcesor
 ip = ImageProcesor()
 image = ip.read_image('imagePath/')
 ip.show_image(image) # muestra una sola imagen
-ip.show_image([image]) #muestra un conjunto de imagenes
+ip.show_images([image]) #muestra un conjunto de imagenes
 ~~~
 
 ![imagen 1](src/images/Captura%20de%20pantalla_2020-06-20_08-48-56.png)
