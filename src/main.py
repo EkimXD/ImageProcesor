@@ -106,6 +106,16 @@ class Application(tk.Frame):
         self.frame.destroy()
         self.create_table()
 
+    def make_example(self):
+        self.image = self.ip.degrade_example(self.image)
+        self.frame.destroy()
+        self.create_table()
+
+    def media_filter(self):
+        self.image = self.ip.median_filter(self.image)
+        self.frame.destroy()
+        self.create_table()
+
     def cancel_create(self):
         self.enable_buttons()
         self.frame.destroy()
@@ -116,6 +126,7 @@ class Application(tk.Frame):
         self.frame.destroy()
         self.create_secundary()
 
+
     def create_secundary(self):
         self.frame1 = tk.Frame(self.master)
         self.frame1.pack(side="bottom")
@@ -125,6 +136,12 @@ class Application(tk.Frame):
         show_image_button = tk.Button(self.frame1, text="Export in text", fg="white", bg="#b5bf21",
                                       command=self.save_file_text)
         show_image_button.grid(row=0, column=1)
+        show_image_button = tk.Button(self.frame1, text="Make image example", fg="white", bg="#7332a6",
+                                      command=self.make_example)
+        show_image_button.grid(row=0, column=2)
+        show_image_button = tk.Button(self.frame1, text="Media filter", fg="white", bg="#7332a6",
+                                      command=self.media_filter)
+        show_image_button.grid(row=0, column=3)
         self.create_table()
 
     def create_table(self):
@@ -135,13 +152,14 @@ class Application(tk.Frame):
         for i in range(len(self.image) - indicadorx):
             for j in range(len(self.image[0]) - indicadory):
                 var = tk.StringVar(root)
-                var.set(int(self.image[i, j, 0] / 25))
+                var.set(int(self.image[i, j, 0] / 25) * 10)
                 spin = tk.Spinbox(self.frame,
                                   width=3,
                                   from_=0,
-                                  to=10,
+                                  to=100,
                                   state="readonly",
-                                  textvariable=var
+                                  textvariable=var,
+                                  increment=10
                                   )
                 spin["command"] = lambda x=i, y=j, value=spin: self.changeValue(x, y, int(value.get()))
                 spin.grid(column=j, row=i)
@@ -150,7 +168,7 @@ class Application(tk.Frame):
         self.enable_buttons()
 
     def changeValue(self, x, y, value):
-        self.image[x, y] = value * 25
+        self.image[x, y] = value / 10 * 25
 
 
 root = tk.Tk()

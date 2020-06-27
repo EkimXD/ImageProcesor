@@ -92,8 +92,9 @@ class ImageProcesor:
 
     ban = False
 
-    def save(self, dir,image):
-        cv2.imwrite(dir,image)
+    def save(self, dir, image):
+        cv2.imwrite(dir, image)
+
     def mouse_callback(self, event, x, y, flags, params):
 
         if event == cv2.EVENT_LBUTTONDOWN:
@@ -105,3 +106,18 @@ class ImageProcesor:
 
         if event == cv2.EVENT_LBUTTONUP:
             self.ban = False
+
+    def degrade_example(self, image):
+        aux = 0
+        for i in range(len(image)):
+            for j in range(len(image[0])):
+                if aux <= 10:
+                    image[i, j] = aux * 25
+                    aux += 1
+                else:
+                    image[i, j] = 0
+                    aux = 1
+        return image.copy()
+
+    def median_filter(self, image):
+        return cv2.medianBlur(image, 5)
