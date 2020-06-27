@@ -33,7 +33,7 @@ Para guardar en un archivo:
 ~~~
 ip = ImageProcesor()
 image = ip.read_image('imagePath/')
-text=ip.change_image_character(image,True)
+text=ip.change_image_character(image,savedata=True)
 ~~~
 
 ![imagen 1](src/images/Captura%20de%20pantalla_2020-06-18_21-33-39.png)
