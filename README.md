@@ -33,7 +33,7 @@ Para guardar en un archivo:
 ~~~
 ip = ImageProcesor()
 image = ip.read_image('imagePath/')
-text=ip.change_image_character(image,True)
+text=ip.change_image_character(image,savedata=True)
 ~~~
 
 ![imagen 1](src/images/Captura%20de%20pantalla_2020-06-18_21-33-39.png)
@@ -83,5 +83,7 @@ Cosas a considerar:
 - Los valores en los recuadros estan mapeados en 11 niveles, del 0 al 10, es decir de 0 a 255 respectivamente.
 - Si la imagen que se carga es demaciado grande solamente se muestra una porcion de la imagen, en este caso solo la parte superior derecha.
 - El boton "Show image" abre una ventana en la que se puede dibujar, pero solo en comor negro, ademas para regresar a la anterior ventana se tiene que presionar enter.
+
+
 ![imagen 1](src/images/Captura.png)
 
