@@ -3,6 +3,7 @@ import numpy as np
 
 
 class ImageProcesor:
+    image: None
 
     def get_R(self, image):
         img = image.copy()
@@ -54,17 +55,19 @@ class ImageProcesor:
     def show_images(self, images):  # solo acepta arreglos de imagenes del mismo tamano
         cv2.imshow("Image", np.hstack(images))
         cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
-    def change_image_character(self, image, savedata=False, characters=['#', '&', '$', '%', '/', 'i', ';', ':', '.',
-                                                                        ' ']):  # solo del primer canal por que si xD
+    def change_image_character(self, image, dir=None, savedata=False,
+                               characters=['#', '&', '$', '%', '/', 'i', ';', ':', '.',
+                                           ' ']):  # solo del primer canal por que si xD
         parts = 255 / len(characters)
         imgaux = []
         for x in range(len(image)):
             for y in range(len(image[0])):
-                imgaux.append(characters[int((image[x, y, 0] - 1) / parts)])
+                imgaux.append(characters[int((image[x, y] - 1) / parts)])
         imgaux = np.array(imgaux).reshape((len(image), len(image[0])))
         if savedata:
-            np.savetxt('data.txt', imgaux, fmt='%s', delimiter='   ')
+            np.savetxt(dir, imgaux, fmt='%s', delimiter='   ')
         return imgaux
 
     def blur_filter(self, image, pblur=1):  # no hacer caso, es basura :v
@@ -75,3 +78,30 @@ class ImageProcesor:
                     media = np.mean(self.crop_coordinates(image[:, :, z], x - 1, y - 1, x + 1, y + 1))
                     imgaux[x, y, z] = int((imgaux[x, y, z] + media) / 2)
         return imgaux
+
+    def show_image_clic(self, image):
+        self.image = image
+        cv2.namedWindow('image')
+        cv2.setMouseCallback('image', self.mouse_callback)
+        while 1:
+            cv2.imshow('image', self.image)
+            key = cv2.waitKey(1)
+            if key == 13:
+                break
+        cv2.destroyAllWindows()
+
+    ban = False
+
+    def save(self, dir,image):
+        cv2.imwrite(dir,image)
+    def mouse_callback(self, event, x, y, flags, params):
+
+        if event == cv2.EVENT_LBUTTONDOWN:
+            self.ban = True
+            self.image[y, x] = 0
+
+        if self.ban:
+            self.image[y, x] = 0
+
+        if event == cv2.EVENT_LBUTTONUP:
+            self.ban = False
