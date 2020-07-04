@@ -112,9 +112,12 @@ class Application(tk.Frame):
         i = self.combo_box.current()
         if i == 0:
             self.image = self.ip.degrade_example(self.image)
-        self.image = functions_from_scratch.median_blur(self.image, 3)
-        self.image = functions_from_scratch.cross_median_blur(self.image,3)
-        self.image = functions_from_scratch.old_sobel(self.image)
+        if i==1:
+            self.image = functions_from_scratch.median_blur(self.image, 3)
+        if i == 1:
+            self.image = functions_from_scratch.cross_median_blur(self.image,3)
+        if i == 1:
+            self.image = functions_from_scratch.old_sobel(self.image)
         self.frame.destroy()
         self.create_table()
 
@@ -135,7 +138,7 @@ class Application(tk.Frame):
 
     def create_secundary(self):
         #### Aqui los nombres de los metodos a implementarse solo esta asignada la posicion 0 :v
-        combo_values = ["Create example"]
+        combo_values = ["Create example", "Median blur", "cross_median_blur", "old_sobel"]
 
         #######################################################################################
         self.frame1 = tk.Frame(self.master)
