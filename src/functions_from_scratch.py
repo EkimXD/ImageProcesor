@@ -11,20 +11,27 @@ Este código esta basado en el explicado en:
 * http://www.adeveloperdiary.com/data-science/computer-vision/how-to-implement-sobel-edge-detection-using-python-from-scratch/
 """
 
+
 def is_even(number):
     return number % 2 == 0
+
+
 def create_2d_filter(rows, columns):
     if (rows == 1 and columns == 1):
         raise "Filter to little, increase rows or columns"
     if is_even(rows) or is_even(columns):
         raise "Rows and columns must be odd numbers"
     return [0] * rows * columns
+
+
 def create_cross_filter(length):
     return np.zeros((length, length))
+
 
 def convolution_median_blur(image, kernel):
     # TODO
     return None
+
 
 def convolution_sobel(image, kernel):
     kernel = np.array(kernel)
@@ -32,7 +39,7 @@ def convolution_sobel(image, kernel):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     image_rows, image_columns = image.shape
     kernel_rows, kernel_columns = kernel.shape
-    
+
     #output = np.zeros(image.shape)
     output = np.zeros(image.shape)
 
@@ -41,44 +48,51 @@ def convolution_sobel(image, kernel):
 
     # Create a np.array with zeros on the borders
     #padded_image = np.zeros((image_rows + (2 * pad_height),(image_columns+(2 * pad_width))))
-    padded_image = np.zeros((image_rows + (2 * pad_height),(image_columns+(2 * pad_width))))
+    padded_image = np.zeros(
+        (image_rows + (2 * pad_height), (image_columns+(2 * pad_width))))
     # Putting values from the original image on the new array padded.
-    padded_image[pad_height:padded_image.shape[0] - pad_height, pad_width:padded_image.shape[1] - pad_width] = np.array(image)
+    padded_image[pad_height:padded_image.shape[0] - pad_height,
+                 pad_width:padded_image.shape[1] - pad_width] = np.array(image)
     #padded_image = np.copy(padded_image)
     for row in range(image_rows):
         for col in range(image_columns):
-            output[row, col] = np.sum(kernel * padded_image[row:row + kernel_rows, col: col + kernel_columns])
-    
+            output[row, col] = np.sum(
+                kernel * padded_image[row:row + kernel_rows, col: col + kernel_columns])
+
     return output
 
-def generate_arrays(rows,columns):
+
+def generate_arrays(rows, columns):
     if rows == 1:
         height_array = [rows]
     else:
-        height_array = list(range(-1*int(rows/2),int(rows/2)+1))
+        height_array = list(range(-1*int(rows/2), int(rows/2)+1))
     if columns == 1:
         width_array = [columns]
     else:
-        width_array = list(range(-1*int(columns/2),int(columns/2)+1))
+        width_array = list(range(-1*int(columns/2), int(columns/2)+1))
     return width_array, height_array
+
 
 def sobel(image):
     width_array, height_array = generate_arrays(3, 3)
-    vertical_filter = np.array(([-1,0,1],[-2,0,2],[-1,0,1]))
+    vertical_filter = np.array(([-1, 0, 1], [-2, 0, 2], [-1, 0, 1]))
     horizontal_filter = np.flip(vertical_filter.T, axis=0)
 
     new_image_x = convolution_sobel(image, vertical_filter)
     new_image_y = convolution_sobel(image, horizontal_filter)
 
     #magnitud_gradiente = np.sqrt(np.square(new_image_x) + np.square(new_image_y))
-    magnitud_gradiente = np.sqrt(np.square(new_image_x) + np.square(new_image_y))
+    magnitud_gradiente = np.sqrt(
+        np.square(new_image_x) + np.square(new_image_y))
     magnitud_gradiente *= 255 / magnitud_gradiente.max()
     return magnitud_gradiente
+
 
 def old_sobel(image):
     width_array, height_array = generate_arrays(3, 3)
     padding = max(width_array + height_array)
-    
+
     members = []
     #image = cv2.copyMakeBorder(image_unbordered, padding,padding,padding,padding,cv2.BORDER_REFLECT)
     image = np.array(image)
@@ -86,10 +100,10 @@ def old_sobel(image):
     width, height, _ = new_image.shape
     for i in range(padding, width-padding):
         for j in range(padding, height-padding):
-            #Inicializar Gx y Gy
+            # Inicializar Gx y Gy
             Gx = 0
             Gy = 0
-            
+
             p = new_image[i-padding, j-padding]
             r = p[0]
             g = p[1]
@@ -159,10 +173,39 @@ def old_sobel(image):
             length = int(length)
             # draw the length in the edge image
             #newpixel = img.putpixel((length,length,length))
-            image[i,j,0] = length
-            image[i,j,1] = length
-            image[i,j,2] = length
+            image[i, j, 0] = length
+            image[i, j, 1] = length
+            image[i, j, 2] = length
     return image
+
+
+def cross_median_blur(image_unbordered, rows, columns=None):
+    if columns == None:
+        columns = rows
+    if (rows == 1 and columns == 1):
+        raise "Filter to little, increase rows or columns"
+    if is_even(rows) or is_even(columns):
+        raise "Rows and columns must be odd numbers"
+    width_array, height_array = generate_arrays(rows, columns)
+    del(width_array[1])
+    #print(width_array, height_array)
+    padding = max(width_array + height_array)
+    members = []
+    #image = cv2.copyMakeBorder(image_unbordered, padding,padding,padding,padding,cv2.BORDER_REFLECT)
+    image = np.copy(image_unbordered)
+    if len(image.shape) == 3:
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    width, height = image.shape
+    # convolucion
+    for i in range(padding, width-padding):
+        for j in range(padding, height-padding):
+            height_members = [image[i, j+beta] for beta in height_array]
+            width_members = [image[i+alpha, j] for alpha in width_array]
+            members = height_members + width_members
+            image_unbordered[i-padding, j-padding] = median(members)
+            # print(i,j,len(members))
+    return image_unbordered
+
 
 def median_blur(image_unbordered, rows, columns=None):
     if columns == None:
@@ -183,11 +226,11 @@ def median_blur(image_unbordered, rows, columns=None):
     # convolucion
     for i in range(padding, width-padding):
         for j in range(padding, height-padding):
-            members = [image[i+alpha, j+beta] 
-                        for alpha in width_array
-                        for beta in height_array]
-            image_unbordered[i-padding,j-padding] = median(members)
-            #print(i,j,len(members))
+            members = [image[i+alpha, j+beta]
+                       for alpha in width_array
+                       for beta in height_array]
+            image_unbordered[i-padding, j-padding] = median(members)
+            # print(i,j,len(members))
     return image_unbordered
     """
     for i in range(0, image.shape[0]-1):
@@ -206,7 +249,8 @@ def median_blur(image_unbordered, rows, columns=None):
     return image_unbordered
     """
 
-"""
+
+
 path="src/images/mona.png"
 #path="src/prueba.png"
 #path="src/images/izayoi.png"
@@ -217,18 +261,18 @@ cv2.waitKey(0)
 cv2.imshow("Imagen",image)
 
 print(image.shape)
-cv2.imshow("Imagen 2",median_blur(image,3))
-cv2.imshow("Imagen 3",cv2.medianBlur(image,3))
+cv2.imshow("Imagen 2",cross_median_blur(image,5))
+cv2.imshow("Imagen 3",cv2.medianBlur(image,5))
 cv2.waitKey(0)
 cv2.destroyAllWindows()    
 
 
 """
-path="src/images/izayoi.png"
+path = "src/images/izayoi.png"
 image = cv2.imread(path)
 cv2.imshow("Imagen", image)
 #cv2.imshow("Imagen 2",old_sobel(image))
-cv2.imshow("Imagen 3",sobel(image))
+cv2.imshow("Imagen 3", sobel(image))
 cv2.waitKey(0)
-cv2.destroyAllWindows() 
-#"""
+cv2.destroyAllWindows()
+"""

@@ -4,6 +4,7 @@ import tkinter as tk
 import numpy as np
 from tkinter.filedialog import askopenfilename, asksaveasfile
 import cv2
+import functions_from_scratch
 
 
 class Application(tk.Frame):
@@ -107,16 +108,13 @@ class Application(tk.Frame):
         self.frame.destroy()
         self.create_table()
 
-    def aply_filter(self):
+    def apply_filter(self):
         i = self.combo_box.current()
         if i == 0:
             self.image = self.ip.degrade_example(self.image)
-        # aqui ingresa los if a partir del 1 XD ##############
-
-
-
-
-        #####################################################
+        self.image = functions_from_scratch.median_blur(self.image, 3)
+        self.image = functions_from_scratch.cross_median_blur(self.image,3)
+        self.image = functions_from_scratch.old_sobel(self.image)
         self.frame.destroy()
         self.create_table()
 
@@ -153,7 +151,7 @@ class Application(tk.Frame):
         self.combo_box = ttk.Combobox(self.frame1, values=combo_values, state="readonly")
         self.combo_box.grid(row=0, column=1)
         show_image_button = tk.Button(self.frame1, text="Apply filter", fg="white", bg="#7332a6",
-                                      command=self.aply_filter)
+                                      command=self.apply_filter)
         show_image_button.grid(row=0, column=2)
         # show_image_button = tk.Button(self.frame1, text="Media filter", fg="white", bg="#7332a6",
         #                               command=self.media_filter)
