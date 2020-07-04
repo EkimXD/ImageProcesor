@@ -206,6 +206,35 @@ def cross_median_blur(image_unbordered, rows, columns=None):
             # print(i,j,len(members))
     return image_unbordered
 
+def equis_median_blur(image_unbordered, rows, columns=None):
+    if columns == None:
+        columns = rows
+    if (rows == 1 and columns == 1):
+        raise "Filter to little, increase rows or columns"
+    if is_even(rows) or is_even(columns):
+        raise "Rows and columns must be odd numbers"
+    width_array, height_array = generate_arrays(rows, columns)
+    del(width_array[1])
+    del(height_array[1])
+    #print(width_array, height_array)
+    padding = max(width_array + height_array)
+    members = []
+    #image = cv2.copyMakeBorder(image_unbordered, padding,padding,padding,padding,cv2.BORDER_REFLECT)
+    image = np.copy(image_unbordered)
+    if len(image.shape) == 3:
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    width, height = image.shape
+    # convolucion
+    for i in range(padding, width-padding):
+        for j in range(padding, height-padding):
+            members = [image[i+alpha, j+beta]
+                       for alpha in width_array
+                       for beta in height_array]
+            members.append(image[i,j])
+            image_unbordered[i-padding, j-padding] = median(members)
+            # print(i,j,len(members))
+    return image_unbordered
+
 
 def median_blur(image_unbordered, rows, columns=None):
     if columns == None:
