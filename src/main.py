@@ -109,15 +109,17 @@ class Application(tk.Frame):
         self.create_table()
 
     def apply_filter(self):
-        i = self.combo_box.current()
+        i = self.combo_box_filter.current()
+        j = self.combo_box_kernel.current()
+        kernel = [3,5,9]
         if i == 0:
             self.image = self.ip.degrade_example(self.image)
         if i == 1:
-            self.image = functions_from_scratch.median_blur(self.image, 3)
+            self.image = functions_from_scratch.median_blur(self.image, kernel[j])
         if i == 2:
-            self.image = functions_from_scratch.cross_median_blur(self.image,3)
+            self.image = functions_from_scratch.cross_median_blur(self.image,kernel[j])
         if i == 3:
-            self.image = functions_from_scratch.equis_median_blur(self.image,3)
+            self.image = functions_from_scratch.equis_median_blur(self.image,kernel[j])
         if i == 4:
             self.image = functions_from_scratch.old_sobel(self.image)
         self.frame.destroy()
@@ -141,7 +143,7 @@ class Application(tk.Frame):
     def create_secundary(self):
         #### Aqui los nombres de los metodos a implementarse solo esta asignada la posicion 0 :v
         combo_values = ["Create example", "Median blur", "cross_median_blur", "equis_median_blur","sobel"]
-
+        kernel = ["3","5","9"]
         #######################################################################################
         self.frame1 = tk.Frame(self.master)
         self.frame1.pack(side="bottom")
@@ -153,8 +155,12 @@ class Application(tk.Frame):
         show_image_button.grid(row=2, column=2)
         label_filter = tk.Label(self.frame1, text="Filter ")
         label_filter.grid(row=0, column=0)
-        self.combo_box = ttk.Combobox(self.frame1, values=combo_values, state="readonly")
-        self.combo_box.grid(row=0, column=1)
+        label_kernel = tk.Label(self.frame1, text="Kernel ")
+        label_kernel.grid(row=1, column=0)
+        self.combo_box_filter = ttk.Combobox(self.frame1, values=combo_values, state="readonly")
+        self.combo_box_filter.grid(row=0, column=1)
+        self.combo_box_kernel = ttk.Combobox(self.frame1, values=kernel, state="readonly")
+        self.combo_box_kernel.grid(row=1, column=1)
         show_image_button = tk.Button(self.frame1, text="Apply filter", fg="white", bg="#7332a6",
                                       command=self.apply_filter)
         show_image_button.grid(row=0, column=2)
