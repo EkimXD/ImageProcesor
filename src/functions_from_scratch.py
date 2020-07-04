@@ -249,7 +249,7 @@ def median_blur(image_unbordered, rows, columns=None):
     return image_unbordered
     """
 
-
+"""
 
 path="src/images/mona.png"
 #path="src/prueba.png"
@@ -267,7 +267,7 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()    
 
 
-"""
+
 path = "src/images/izayoi.png"
 image = cv2.imread(path)
 cv2.imshow("Imagen", image)
