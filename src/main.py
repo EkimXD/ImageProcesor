@@ -1,4 +1,5 @@
 from image_procesor import ImageProcesor
+from tkinter import ttk
 import tkinter as tk
 import numpy as np
 from tkinter.filedialog import askopenfilename, asksaveasfile
@@ -106,8 +107,16 @@ class Application(tk.Frame):
         self.frame.destroy()
         self.create_table()
 
-    def make_example(self):
-        self.image = self.ip.degrade_example(self.image)
+    def aply_filter(self):
+        i = self.combo_box.current()
+        if i == 0:
+            self.image = self.ip.degrade_example(self.image)
+        # aqui ingresa los if a partir del 1 XD ##############
+
+
+
+
+        #####################################################
         self.frame.destroy()
         self.create_table()
 
@@ -126,22 +135,29 @@ class Application(tk.Frame):
         self.frame.destroy()
         self.create_secundary()
 
-
     def create_secundary(self):
+        #### Aqui los nombres de los metodos a implementarse solo esta asignada la posicion 0 :v
+        combo_values = ["Create example"]
+
+        #######################################################################################
         self.frame1 = tk.Frame(self.master)
         self.frame1.pack(side="bottom")
 
         show_image_button = tk.Button(self.frame1, text="Show image", fg="white", bg="#7332a6", command=self.show_image)
-        show_image_button.grid(row=0, column=0)
+        show_image_button.grid(row=1, column=2)
         show_image_button = tk.Button(self.frame1, text="Export in text", fg="white", bg="#b5bf21",
                                       command=self.save_file_text)
-        show_image_button.grid(row=0, column=1)
-        show_image_button = tk.Button(self.frame1, text="Make image example", fg="white", bg="#7332a6",
-                                      command=self.make_example)
+        show_image_button.grid(row=2, column=2)
+        label_filter = tk.Label(self.frame1, text="Filter ")
+        label_filter.grid(row=0, column=0)
+        self.combo_box = ttk.Combobox(self.frame1, values=combo_values, state="readonly")
+        self.combo_box.grid(row=0, column=1)
+        show_image_button = tk.Button(self.frame1, text="Apply filter", fg="white", bg="#7332a6",
+                                      command=self.aply_filter)
         show_image_button.grid(row=0, column=2)
-        show_image_button = tk.Button(self.frame1, text="Media filter", fg="white", bg="#7332a6",
-                                      command=self.media_filter)
-        show_image_button.grid(row=0, column=3)
+        # show_image_button = tk.Button(self.frame1, text="Media filter", fg="white", bg="#7332a6",
+        #                               command=self.media_filter)
+        # show_image_button.grid(row=0, column=3)
         self.create_table()
 
     def create_table(self):
