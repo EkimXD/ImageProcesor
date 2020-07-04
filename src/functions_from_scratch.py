@@ -4,6 +4,7 @@ import cv2
 from statistics import median
 import os
 import math as m
+from matplotlib import pyplot as plt
 
 """
 Este código esta basado en el explicado en:
@@ -235,7 +236,14 @@ def equis_median_blur(image_unbordered, rows, columns=None):
             # print(i,j,len(members))
     return image_unbordered
 
-
+def get_histogram(image, bins):
+    if len(image.shape) == 3:
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        # find frequency of pixels in range 0-255 
+    histr = cv2.calcHist(image,[0],None,[256],[0,256]) 
+    # show the plotting graph of an image 
+    plt.plot(histr) 
+    plt.show() 
 def median_blur(image_unbordered, rows, columns=None):
     if columns == None:
         columns = rows

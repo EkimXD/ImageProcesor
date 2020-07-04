@@ -5,6 +5,7 @@ import numpy as np
 from tkinter.filedialog import askopenfilename, asksaveasfile
 import cv2
 import functions_from_scratch
+from matplotlib import pyplot as plt
 
 
 class Application(tk.Frame):
@@ -107,6 +108,13 @@ class Application(tk.Frame):
         self.ip.show_image_clic(self.image)
         self.frame.destroy()
         self.create_table()
+    
+    def show_histogram(self):
+        image = self.image
+        if len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        plt.hist(image.ravel(),256,[0,256]) 
+        plt.show() 
 
     def apply_filter(self):
         i = self.combo_box_filter.current()
@@ -153,6 +161,9 @@ class Application(tk.Frame):
         show_image_button = tk.Button(self.frame1, text="Export in text", fg="white", bg="#b5bf21",
                                       command=self.save_file_text)
         show_image_button.grid(row=2, column=2)
+        show_image_button = tk.Button(self.frame1, text="Show Histogram", fg="white", bg="#b5bf21",
+                                      command=self.show_histogram)
+        show_image_button.grid(row=2, column=0)
         label_filter = tk.Label(self.frame1, text="Filter ")
         label_filter.grid(row=0, column=0)
         label_kernel = tk.Label(self.frame1, text="Kernel ")
