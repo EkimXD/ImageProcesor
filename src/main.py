@@ -118,7 +118,7 @@ class Application(tk.Frame):
             self.image = functions_from_scratch.cross_median_blur(self.image,3)
         if i == 3:
             self.image = functions_from_scratch.equis_median_blur(self.image,3)
-        if i == 3:
+        if i == 4:
             self.image = functions_from_scratch.old_sobel(self.image)
         self.frame.destroy()
         self.create_table()
