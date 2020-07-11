@@ -251,13 +251,13 @@ def make_histogram(image):
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     #print(image2.size)
     img_arr = np.copy(image)
-    img_float = img_arr.astype('float32')
     flat = img_arr.flatten()
 
-    # Take a flattened greyscale image and create a historgram from it 
-    histogram = np.zeros(256, dtype=int)
+    # Take a flattened greyscale image and create a historgram from it
+    image_range = 100 
+    histogram = np.zeros(image_range, dtype=int)
     for i in range(flat.size):
-        histogram[flat[i]] += 1
+        histogram[int(flat[i]*image_range/256)] += 1
     return histogram
 
 def median_blur(image_unbordered, rows, columns=None):
