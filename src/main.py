@@ -114,12 +114,21 @@ class Application(tk.Frame):
         if len(image.shape) == 3:
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         #x=image[:,:,0]
-        histr = cv2.calcHist([image],[0],None,[256],[0,256]) 
-        plt.title("HIstogramm for given Image")
+        histr = cv2.calcHist([image],[0],None,[256],[0,256])
+        plt.title("Histogram for given Image")
         plt.xlabel("Value")
         plt.ylabel("pixels Frequency")
         plt.plot(histr) 
-        plt.show() 
+        plt.show()
+    
+    def show_histogram_from_scratch(self):
+        image = self.image
+        histr = functions_from_scratch.make_histogram(image)
+        plt.title("Histogram for given Image")
+        plt.xlabel("Value")
+        plt.ylabel("pixels Frequency")
+        plt.plot(histr) 
+        plt.show()
 
     def apply_filter(self):
         i = self.combo_box_filter.current()
@@ -167,7 +176,7 @@ class Application(tk.Frame):
                                       command=self.save_file_text)
         show_image_button.grid(row=2, column=2)
         show_image_button = tk.Button(self.frame1, text="Show Histogram", fg="white", bg="#b5bf21",
-                                      command=self.show_histogram)
+                                      command=self.show_histogram_from_scratch)
         show_image_button.grid(row=2, column=0)
         label_filter = tk.Label(self.frame1, text="Filter ")
         label_filter.grid(row=0, column=0)

@@ -244,6 +244,22 @@ def get_histogram(image, bins):
     # show the plotting graph of an image 
     plt.plot(histr) 
     plt.show() 
+
+# This code was based on: https://github.com/hosnaa/Histograms_scratch
+def make_histogram(image):
+    if len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    #print(image2.size)
+    img_arr = np.copy(image)
+    img_float = img_arr.astype('float32')
+    flat = img_arr.flatten()
+
+    # Take a flattened greyscale image and create a historgram from it 
+    histogram = np.zeros(256, dtype=int)
+    for i in range(flat.size):
+        histogram[flat[i]] += 1
+    return histogram
+
 def median_blur(image_unbordered, rows, columns=None):
     if columns == None:
         columns = rows
