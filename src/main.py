@@ -1,8 +1,11 @@
 from image_procesor import ImageProcesor
+from tkinter import ttk
 import tkinter as tk
 import numpy as np
 from tkinter.filedialog import askopenfilename, asksaveasfile
 import cv2
+import functions_from_scratch
+from matplotlib import pyplot as plt
 
 
 class Application(tk.Frame):
@@ -105,6 +108,55 @@ class Application(tk.Frame):
         self.ip.show_image_clic(self.image)
         self.frame.destroy()
         self.create_table()
+    
+    def show_histogram(self):
+        image = self.image
+        if len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        #x=image[:,:,0]
+        histr = cv2.calcHist([image],[0],None,[256],[0,256])
+        plt.title("Histogram for given Image")
+        plt.xlabel("Value")
+        plt.ylabel("pixels Frequency")
+        plt.plot(histr) 
+        plt.show()
+    
+    def show_histogram_from_scratch(self):
+        image = np.copy(self.image)
+        histr = functions_from_scratch.make_histogram(image)
+        plt.title("Histogram for given Image")
+        plt.xlabel("Value")
+        plt.ylabel("pixels Frequency")
+        plt.plot(histr) 
+        plt.show()
+
+    def show_transformed_image(self):
+        image = np.copy(self.image)
+        transformed_image = functions_from_scratch.computeFourierTransforms(image)
+        plt.imshow(transformed_image,cmap='Greys_r')
+        plt.show()
+
+    def apply_filter(self):
+        i = self.combo_box_filter.current()
+        j = self.combo_box_kernel.current()
+        kernel = [3,5,9]
+        if i == 0:
+            self.image = self.ip.degrade_example(self.image)
+        if i == 1:
+            self.image = functions_from_scratch.median_blur(self.image, kernel[j])
+        if i == 2:
+            self.image = functions_from_scratch.cross_median_blur(self.image,kernel[j])
+        if i == 3:
+            self.image = functions_from_scratch.equis_median_blur(self.image,kernel[j])
+        if i == 4:
+            self.image = functions_from_scratch.old_sobel(self.image)
+        self.frame.destroy()
+        self.create_table()
+
+    def media_filter(self):
+        self.image = self.ip.median_filter(self.image)
+        self.frame.destroy()
+        self.create_table()
 
     def cancel_create(self):
         self.enable_buttons()
@@ -117,14 +169,38 @@ class Application(tk.Frame):
         self.create_secundary()
 
     def create_secundary(self):
+        #### Aqui los nombres de los metodos a implementarse solo esta asignada la posicion 0 :v
+        combo_values = ["Create example", "Median blur", "cross_median_blur", "equis_median_blur","sobel","Transformada de Fourier"]
+        kernel = ["3","5","9"]
+        #######################################################################################
         self.frame1 = tk.Frame(self.master)
         self.frame1.pack(side="bottom")
 
         show_image_button = tk.Button(self.frame1, text="Show image", fg="white", bg="#7332a6", command=self.show_image)
-        show_image_button.grid(row=0, column=0)
+        show_image_button.grid(row=1, column=2)
         show_image_button = tk.Button(self.frame1, text="Export in text", fg="white", bg="#b5bf21",
                                       command=self.save_file_text)
-        show_image_button.grid(row=0, column=1)
+        show_image_button.grid(row=2, column=2)
+        show_image_button = tk.Button(self.frame1, text="Show Histogram", fg="white", bg="#b5bf21",
+                                      command=self.show_histogram_from_scratch)
+        show_image_button.grid(row=2, column=0)
+        show_image_button = tk.Button(self.frame1, text="Fourier Transform", fg="white", bg="#b5bf21",
+                                      command=self.show_transformed_image)
+        show_image_button.grid(row=2, column=1)
+        label_filter = tk.Label(self.frame1, text="Filter ")
+        label_filter.grid(row=0, column=0)
+        label_kernel = tk.Label(self.frame1, text="Kernel ")
+        label_kernel.grid(row=1, column=0)
+        self.combo_box_filter = ttk.Combobox(self.frame1, values=combo_values, state="readonly")
+        self.combo_box_filter.grid(row=0, column=1)
+        self.combo_box_kernel = ttk.Combobox(self.frame1, values=kernel, state="readonly")
+        self.combo_box_kernel.grid(row=1, column=1)
+        show_image_button = tk.Button(self.frame1, text="Apply filter", fg="white", bg="#7332a6",
+                                      command=self.apply_filter)
+        show_image_button.grid(row=0, column=2)
+        # show_image_button = tk.Button(self.frame1, text="Media filter", fg="white", bg="#7332a6",
+        #                               command=self.media_filter)
+        # show_image_button.grid(row=0, column=3)
         self.create_table()
 
     def create_table(self):
@@ -135,13 +211,14 @@ class Application(tk.Frame):
         for i in range(len(self.image) - indicadorx):
             for j in range(len(self.image[0]) - indicadory):
                 var = tk.StringVar(root)
-                var.set(int(self.image[i, j, 0] / 25))
+                var.set(int(self.image[i, j, 0] / 25) * 10)
                 spin = tk.Spinbox(self.frame,
                                   width=3,
                                   from_=0,
-                                  to=10,
+                                  to=100,
                                   state="readonly",
-                                  textvariable=var
+                                  textvariable=var,
+                                  increment=10
                                   )
                 spin["command"] = lambda x=i, y=j, value=spin: self.changeValue(x, y, int(value.get()))
                 spin.grid(column=j, row=i)
@@ -150,7 +227,7 @@ class Application(tk.Frame):
         self.enable_buttons()
 
     def changeValue(self, x, y, value):
-        self.image[x, y] = value * 25
+        self.image[x, y] = value / 10 * 25
 
 
 root = tk.Tk()

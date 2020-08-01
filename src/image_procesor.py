@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from matplotlib import pyplot as plt
 
 
 class ImageProcesor:
@@ -80,20 +81,24 @@ class ImageProcesor:
         return imgaux
 
     def show_image_clic(self, image):
-        self.image = image
-        cv2.namedWindow('image')
-        cv2.setMouseCallback('image', self.mouse_callback)
-        while 1:
-            cv2.imshow('image', self.image)
-            key = cv2.waitKey(1)
-            if key == 13:
-                break
-        cv2.destroyAllWindows()
+        self.image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        #cv2.namedWindow('image')
+        plt.title("Image")
+        #cv2.setMouseCallback('image', self.mouse_callback)
+        #while 1:
+            #cv2.imshow('image', self.image)
+        plt.imshow(self.image)
+        plt.show()
+        #    key = cv2.waitKey(1)
+        #    if key == 13:
+        #        break
+        #cv2.destroyAllWindows()
 
     ban = False
 
-    def save(self, dir,image):
-        cv2.imwrite(dir,image)
+    def save(self, dir, image):
+        cv2.imwrite(dir, image)
+
     def mouse_callback(self, event, x, y, flags, params):
 
         if event == cv2.EVENT_LBUTTONDOWN:
@@ -105,3 +110,18 @@ class ImageProcesor:
 
         if event == cv2.EVENT_LBUTTONUP:
             self.ban = False
+
+    def degrade_example(self, image):
+        aux = 0
+        for i in range(len(image)):
+            for j in range(len(image[0])):
+                if aux <= 10:
+                    image[i, j] = aux * 25
+                    aux += 1
+                else:
+                    image[i, j] = 0
+                    aux = 1
+        return image.copy()
+
+    def median_filter(self, image):
+        return cv2.medianBlur(image, 5)
