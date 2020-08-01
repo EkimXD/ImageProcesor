@@ -13,6 +13,7 @@ Este código esta basado en el explicado en:
 """
 
 
+
 def is_even(number):
     return number % 2 == 0
 
@@ -285,3 +286,137 @@ def median_blur(image_unbordered, rows, columns=None):
             image_unbordered[i-padding, j-padding] = median(members)
             # print(i,j,len(members))
     return image_unbordered
+
+# Este código fue tomado de:  https://github.com/PavanGJ/Image-Processing-Techniques
+class FourierTransform() :
+    def __init__(self) :
+        self.f = None
+        self.F = None
+        self.magnitude = None
+        self.phase = None
+        self.M = None
+        self.N = None
+        self.image = None
+    def setImage(self, image) :
+        #image = np.asarray(image, dtype = float)
+        if len(image.shape) == 2 :
+            self.image = image
+            try :
+                self.dimensions = self.image.shape
+            except :
+                print("Internal Error! Image file not supported")
+        else :
+            print("Assignment Error. Given input is not an image")
+    def forwardTransform(self) :
+        try :
+            M = self.image.shape[0]
+            N = self.image.shape[1]
+        except :
+            print("Internal Error! Could not decompose the image shape")
+            return
+        x = np.arange(M, dtype = float)
+        y = np.arange(N, dtype = float)
+        u = x.reshape((M,1))
+        v = y.reshape((N,1))
+        exp_1 = pow(np.e, -2j*np.pi*u*x/M)
+        exp_2 = pow(np.e, -2j*np.pi*v*y/N)
+        self.F = np.dot(exp_2, np.dot(exp_1,self.image).transpose())/(M*N)
+        return self.F
+
+    def inverseTransform(self) :
+        try :
+            M = self.F.shape[0]
+            N = self.F.shape[1]
+        except :
+            print("Internal Error! Could not decompose the image shape")
+            return
+        x = np.arange(M, dtype = float)
+        y = np.arange(N, dtype = float)
+        u = x.reshape((M,1))
+        v = y.reshape((N,1))
+        exp_1 = pow(np.e, 2j*np.pi*u*x/M)
+        exp_2 = pow(np.e, 2j*np.pi*v*y/N)
+        self.f = np.dot(exp_2, np.dot(exp_1,self.F).transpose())
+        return self.f
+    def shift(self, image) :
+        try :
+            M = image.shape[0]
+            N = image.shape[1]
+        except :
+            print("Internal Error! Could not decompose the image shape")
+            return
+        m = int(M/2)
+        n = int(N/2)
+        temp = np.zeros((M,N))
+        print(image.shape, m, n)
+        temp[-m:,-n:] = np.abs(np.copy(image[:m,:n]))
+        temp[-m:,:-n] = np.abs(np.copy(image[:m,n:]))
+        temp[:-m,-n:] = np.abs(np.copy(image[m:,:n]))
+        temp[:-m,:-n] = np.abs(np.copy(image[m:,n:]))
+        return temp
+    def error(self) :
+        E = (self.image - self.f)**2
+        M = E.shape[0]
+        N = E.shape[1]
+        I = np.ones((1,N))
+        J = np.ones((M,1))
+        print("Error: %s"% np.abs(np.dot(np.dot(I,E.transpose()),J)))
+
+class Image() :
+    def __init__(self) :
+        self.image = None
+        self.type = None
+        self.dimensions = []
+    def open(self,path,mode = cv2.IMREAD_GRAYSCALE) :
+        try :
+            self.image =  cv2.imread(path, mode)
+        except Exception as e:
+            print(e+",Error! Could not read the image from the path specified: %s"%path)
+            return
+        
+        try :
+            self.image = np.asarray(self.image, dtype = float)
+            self.dimensions = self.image.shape
+            self.type = path.split(".")[-1]
+        except :
+            print("Internal Error! Image file not supported")
+    def set(self, image) :
+        image = np.asarray(image, dtype = float)
+        if len(image.shape) == 2 :
+            self.image = image
+            try :
+                self.dimensions = self.image.shape
+            except :
+                print("Internal Error! Image file not supported")
+        else :
+            print("Assignment Error. Given input is not an image")
+    def show(self, mode='Greys_r', name=None) :
+        try :
+            plt.imshow(self.image,cmap=mode)
+        except :
+            print("Image Could not be displayed")
+            return
+        if not name is None :
+            plt.imsave(name,self.image,cmap=mode)
+        plt.show()
+def computeFourierTransforms(image) :
+        image_old = np.copy(image)
+        if len(image.shape) == 3:
+            image_gray = cv2.cvtColor(image_old, cv2.COLOR_BGR2GRAY)
+        fourierTransform = FourierTransform()
+        fourierTransform.setImage(image_gray)
+        fimg = Image()
+        fimg.set(np.log(np.abs(fourierTransform.shift(fourierTransform.forwardTransform()))**2))
+        # fimg.show()
+        return fimg.image
+        """
+        infimg = Image()
+        infimg.set(np.abs(fourierTransform.inverseTransform()))
+        # infimg.show()
+        fourierTransform.error()
+        width, height = infimg.image.shape
+        for i in range(width):
+            for j in range(height):
+                image_old[i, j] = infimg.image[i, j]
+        return image_old
+        """

@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from matplotlib import pyplot as plt
 
 
 class ImageProcesor:
@@ -80,15 +81,18 @@ class ImageProcesor:
         return imgaux
 
     def show_image_clic(self, image):
-        self.image = image
-        cv2.namedWindow('image')
-        cv2.setMouseCallback('image', self.mouse_callback)
-        while 1:
-            cv2.imshow('image', self.image)
-            key = cv2.waitKey(1)
-            if key == 13:
-                break
-        cv2.destroyAllWindows()
+        self.image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        #cv2.namedWindow('image')
+        plt.title("Image")
+        #cv2.setMouseCallback('image', self.mouse_callback)
+        #while 1:
+            #cv2.imshow('image', self.image)
+        plt.imshow(self.image)
+        plt.show()
+        #    key = cv2.waitKey(1)
+        #    if key == 13:
+        #        break
+        #cv2.destroyAllWindows()
 
     ban = False
 

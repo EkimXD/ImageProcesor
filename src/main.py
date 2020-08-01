@@ -122,12 +122,18 @@ class Application(tk.Frame):
         plt.show()
     
     def show_histogram_from_scratch(self):
-        image = self.image
+        image = np.copy(self.image)
         histr = functions_from_scratch.make_histogram(image)
         plt.title("Histogram for given Image")
         plt.xlabel("Value")
         plt.ylabel("pixels Frequency")
         plt.plot(histr) 
+        plt.show()
+
+    def show_transformed_image(self):
+        image = np.copy(self.image)
+        transformed_image = functions_from_scratch.computeFourierTransforms(image)
+        plt.imshow(transformed_image,cmap='Greys_r')
         plt.show()
 
     def apply_filter(self):
@@ -164,7 +170,7 @@ class Application(tk.Frame):
 
     def create_secundary(self):
         #### Aqui los nombres de los metodos a implementarse solo esta asignada la posicion 0 :v
-        combo_values = ["Create example", "Median blur", "cross_median_blur", "equis_median_blur","sobel"]
+        combo_values = ["Create example", "Median blur", "cross_median_blur", "equis_median_blur","sobel","Transformada de Fourier"]
         kernel = ["3","5","9"]
         #######################################################################################
         self.frame1 = tk.Frame(self.master)
@@ -178,6 +184,9 @@ class Application(tk.Frame):
         show_image_button = tk.Button(self.frame1, text="Show Histogram", fg="white", bg="#b5bf21",
                                       command=self.show_histogram_from_scratch)
         show_image_button.grid(row=2, column=0)
+        show_image_button = tk.Button(self.frame1, text="Fourier Transform", fg="white", bg="#b5bf21",
+                                      command=self.show_transformed_image)
+        show_image_button.grid(row=2, column=1)
         label_filter = tk.Label(self.frame1, text="Filter ")
         label_filter.grid(row=0, column=0)
         label_kernel = tk.Label(self.frame1, text="Kernel ")
