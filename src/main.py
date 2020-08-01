@@ -1,5 +1,5 @@
 from image_procesor import ImageProcesor
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import tkinter as tk
 import numpy as np
 from tkinter.filedialog import askopenfilename, asksaveasfile
@@ -13,9 +13,12 @@ class Application(tk.Frame):
         super().__init__(master)
         self.ip = ImageProcesor()
         self.master = master
+        self.image = None
         self.master.title(name)
         self.pack()
         self.create_widgets()
+        self.frame1 = None
+        self.frame = None
 
     def create_widgets(self):
         self.load_button = tk.Button(self,
@@ -30,14 +33,31 @@ class Application(tk.Frame):
         self.create_button.pack(side="left")
 
         self.quit_button = tk.Button(self, text="QUIT", fg="white", bg="#FF4633",
-                                     command=self.master.destroy)
+                                     command=self.message_before_exit)
         self.quit_button.pack(side="right")
+        if not self.image is None:
+            self.create_secundary()
+
+    def message_before_exit(self):
+        if not self.image is None and messagebox.askokcancel("Quit", "Se perderán los cambios, ¿continuar?"):
+            self.master.destroy()
+        elif self.image is None:
+            self.master.destroy()
+        else:
+            return
 
     def load_file(self):
+        if not self.image is None and  not messagebox.askokcancel("Quit", "Se perderán los cambios, ¿continuar?"):
+            return
         filename = askopenfilename()
         if filename:
             self.image = self.ip.read_image(filename)
+            if not self.frame1 is None and not self.frame is None:
+                self.frame1.destroy()
+                self.frame.destroy()
             self.create_secundary()
+            self.create_table()
+
 
     def save_file(self):
         f = asksaveasfile(mode='w', defaultextension=".png")
@@ -201,7 +221,6 @@ class Application(tk.Frame):
         # show_image_button = tk.Button(self.frame1, text="Media filter", fg="white", bg="#7332a6",
         #                               command=self.media_filter)
         # show_image_button.grid(row=0, column=3)
-        self.create_table()
 
     def create_table(self):
         self.frame = tk.Frame(self.master)
