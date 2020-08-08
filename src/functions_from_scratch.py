@@ -420,3 +420,64 @@ def computeFourierTransforms(image) :
                 image_old[i, j] = infimg.image[i, j]
         return image_old
         """
+# Este código fue tomado de:  https://github.com/rcote98/FourierFiltering
+def apply_filter(image, filtr):
+    image_old = np.copy(image)
+    image = np.copy(image)
+    """Applies the filter to the image."""
+    if len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    transformed_image = np.fft.fft2(image)
+    fshift = np.fft.fftshift(transformed_image)
+
+    masked = np.multiply(filtr, fshift)
+
+    fishift = np.fft.ifftshift(masked)
+
+    res = np.fft.ifft2(fishift)
+
+    res = np.abs(res)
+
+    for i in range(image_old.shape[0]):
+        for j in range(image_old.shape[1]):
+            image_old[i, j] = res[i,j]
+
+    return image_old
+
+def low_pass_filter(image, fsize):
+
+    """Creates a low-pass square filter 
+    (eliminates high frequencies)
+    for the given image."""
+
+    if len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    H, W = np.shape(image)
+    mW = int(np.fix(0.5*W))
+    mH = int(np.fix(0.5*H))   
+
+    side = fsize
+    mask = np.zeros((H,W))
+    mask[mH-side:mH+side,mW-side:mW+side] = 1
+
+    return mask
+
+def high_pass_filter(image, fsize):
+    
+    """Creates a high-pass square filter 
+    (eliminates low frequencies)
+    for the given image."""
+
+    if len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    H, W = np.shape(image)
+    mW = int(np.fix(0.5*W))
+    mH = int(np.fix(0.5*H))   
+
+    side = fsize
+    mask = np.ones((H,W))
+    mask[mH-side:mH+side,mW-side:mW+side] = 0
+
+    return mask

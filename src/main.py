@@ -1,5 +1,5 @@
 from image_procesor import ImageProcesor
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import tkinter as tk
 import numpy as np
 from tkinter.filedialog import askopenfilename, asksaveasfile
@@ -13,9 +13,12 @@ class Application(tk.Frame):
         super().__init__(master)
         self.ip = ImageProcesor()
         self.master = master
+        self.image = None
         self.master.title(name)
         self.pack()
         self.create_widgets()
+        self.frame1 = None
+        self.frame = None
 
     def create_widgets(self):
         self.load_button = tk.Button(self,
@@ -30,14 +33,31 @@ class Application(tk.Frame):
         self.create_button.pack(side="left")
 
         self.quit_button = tk.Button(self, text="QUIT", fg="white", bg="#FF4633",
-                                     command=self.master.destroy)
+                                     command=self.message_before_exit)
         self.quit_button.pack(side="right")
+        if not self.image is None:
+            self.create_secundary()
+
+    def message_before_exit(self):
+        if not self.image is None and messagebox.askokcancel("Quit", "Se perderán los cambios, ¿continuar?"):
+            self.master.destroy()
+        elif self.image is None:
+            self.master.destroy()
+        else:
+            return
 
     def load_file(self):
+        if not self.image is None and  not messagebox.askokcancel("Quit", "Se perderán los cambios, ¿continuar?"):
+            return
         filename = askopenfilename()
         if filename:
             self.image = self.ip.read_image(filename)
+            if not self.frame1 is None and not self.frame is None:
+                self.frame1.destroy()
+                self.frame.destroy()
             self.create_secundary()
+            self.create_table()
+
 
     def save_file(self):
         f = asksaveasfile(mode='w', defaultextension=".png")
@@ -150,6 +170,12 @@ class Application(tk.Frame):
             self.image = functions_from_scratch.equis_median_blur(self.image,kernel[j])
         if i == 4:
             self.image = functions_from_scratch.old_sobel(self.image)
+        if i == 5:
+            mask = functions_from_scratch.high_pass_filter(self.image, 15)
+            self.image = functions_from_scratch.apply_filter(self.image, mask)
+        if i == 6:
+            mask = functions_from_scratch.low_pass_filter(self.image, 15)
+            self.image = functions_from_scratch.apply_filter(self.image, mask)
         self.frame.destroy()
         self.create_table()
 
@@ -170,7 +196,7 @@ class Application(tk.Frame):
 
     def create_secundary(self):
         #### Aqui los nombres de los metodos a implementarse solo esta asignada la posicion 0 :v
-        combo_values = ["Create example", "Median blur", "cross_median_blur", "equis_median_blur","sobel","Transformada de Fourier"]
+        combo_values = ["Create example", "Median blur", "Cross_median_blur", "Equis_median_blur","sobel","Low_Pass_Filter","High_Pass_Filter"]
         kernel = ["3","5","9"]
         #######################################################################################
         self.frame1 = tk.Frame(self.master)
@@ -201,17 +227,18 @@ class Application(tk.Frame):
         # show_image_button = tk.Button(self.frame1, text="Media filter", fg="white", bg="#7332a6",
         #                               command=self.media_filter)
         # show_image_button.grid(row=0, column=3)
-        self.create_table()
 
     def create_table(self):
         self.frame = tk.Frame(self.master)
         self.frame.pack(side="bottom")
         indicadorx = len(self.image) - 40 if len(self.image) > 40 else 0
         indicadory = len(self.image[0]) - 40 if len(self.image[0]) > 40 else 0
+        #print(self.image.shape, self.image.shape[0],self.image.shape[1])
+        #image = self.image
         for i in range(len(self.image) - indicadorx):
             for j in range(len(self.image[0]) - indicadory):
                 var = tk.StringVar(root)
-                var.set(int(self.image[i, j, 0] / 25) * 10)
+                var.set(int(self.image[i, j,0] / 25) * 10)
                 spin = tk.Spinbox(self.frame,
                                   width=3,
                                   from_=0,
